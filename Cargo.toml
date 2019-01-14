@@ -1,0 +1,10 @@
+[package]
+name = "citrine"
+version = "0.1.0"
+authors = ["Tal Glanzman <talglanzman@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+serde = "1.0"
+serde_derive = "1.0"
+amethyst = "0.10.0"
