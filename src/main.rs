@@ -1,9 +1,12 @@
-#[macro_use]
 extern crate serde_derive;
+extern crate serde;
+
 extern crate amethyst;
+extern crate tiled;
 
 mod config;
 mod states;
+mod asset_loaders;
 
 use std::time::{Duration};
 
@@ -21,14 +24,19 @@ use amethyst::{
         DrawFlat,
         PosTex
     },
-
+    assets::{
+        Processor
+    },
     utils::{
         application_root_dir
     },
 };
 
+
 fn main() -> amethyst::Result<()> {
-    amethyst::start_logger(Default::default());
+    let mut logger_config: amethyst::LoggerConfig = Default::default();
+    logger_config.level_filter = amethyst::LogLevelFilter::Debug;
+    amethyst::start_logger(logger_config);
 
     let app_path = application_root_dir();
 
@@ -40,9 +48,10 @@ fn main() -> amethyst::Result<()> {
 
     let game_data = GameDataBuilder::default()
         .with_bundle(TransformBundle::new())?
-        .with_basic_renderer(display_config_path, DrawFlat::<PosTex>::new(), true)?;
+        .with_basic_renderer(display_config_path, DrawFlat::<PosTex>::new(), true)?
+        .with(Processor::<asset_loaders::tiled_map::TiledMap>::new(), "", &[]);
 
-    let mut application = Application::build(assets_dir, states::InitialState)?
+    let mut application = Application::build(assets_dir, states::InitialState::new())?
         .with_frame_limit(
             FrameRateLimitStrategy::SleepAndYield(Duration::from_millis(2)),
             120,
